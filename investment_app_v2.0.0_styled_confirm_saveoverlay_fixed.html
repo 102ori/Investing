@@ -1,1 +1,1881 @@
+<!DOCTYPE html>
 
+<html lang="he">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ניהול השקעות - גרסה 2.0.0</title>
+<style>
+    body {
+      direction: rtl;
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f4;
+      color: #333;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    body.dark {
+      background-color: #121212;
+      color: #eee;
+    }
+    button, input, select {
+      padding: 10px;
+      margin: 5px;
+      font-size: 1em;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    th {
+  font-size: 1em;
+  letter-spacing: 0.5px;
+      background-color: #0077cc;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    body.dark tr:nth-child(even) {
+      background-color: #1e1e1e;
+    }
+    canvas {
+      margin-top: 30px;
+    }
+  
+@media (min-width: 768px) {
+  canvas {
+    max-height: 350px !important;
+  }
+}
+@media (max-width: 767px) {
+  canvas {
+    max-height: 90vw !important;
+  }
+}
+
+/* High-Tech Combined Theme */
+body {
+  background: #f2f4f8;
+  font-family: 'Segoe UI', 'Rubik', sans-serif;
+  color: #222;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.dark {
+  background: #1c1e26;
+  color: #f0f0f0;
+}
+
+#investment-form, #investment-table {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  padding: 15px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+button {
+  border-radius: 8px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+button:hover {
+  transform: scale(1.03);
+}
+
+#investment-table th {
+  background-color: #007BFF;
+  color: white;
+}
+
+#investment-table td {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+body.dark #investment-table td {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+#view-history, #show-returns, #theme-toggle {
+  background: #ffffff;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+body.dark #view-history, body.dark #show-returns {
+  background: #2a2a2a;
+  color: #eee;
+  border-color: #444;
+}
+
+
+/* Buttons - Enhanced Style */
+button {
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 0.95em;
+  border: 1px solid #007BFF;
+  background-color: white;
+  color: #007BFF;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+button:hover {
+  background-color: #007BFF;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+  transform: translateY(-1px);
+}
+
+body.dark button {
+  background-color: #2a2a2a;
+  color: #00bfff;
+  border: 1px solid #00bfff;
+}
+
+body.dark button:hover {
+  background-color: #00bfff;
+  color: #1c1e26;
+  box-shadow: 0 4px 12px rgba(0,191,255,0.3);
+}
+
+
+/* Brightened Dark mode adjustments */
+body.dark {
+  background: #1a1d23;
+  color: #f5f5f5;
+}
+
+body.dark #investment-form, 
+body.dark #investment-table {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #555;
+}
+
+body.dark #investment-table th {
+  background-color: #3399ff;
+  color: #ffffff;
+}
+
+body.dark #investment-table td {
+  background: rgba(255, 255, 255, 0.03);
+  color: #f5f5f5;
+}
+
+body.dark input,
+body.dark select {
+  background-color: #2a2d35;
+  color: #ffffff;
+  border: 1px solid #666;
+}
+
+body.dark #rate-box {
+  color: #ffffff;
+}
+
+
+  /* Budget Modal styles */
+  #budget-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 10000; }
+  #budget-modal-content { background: #fff; padding: 20px; border-radius: 12px; max-width: 95vw; max-height: 95vh; overflow: auto; text-align: right; }
+  #budget-modal-content h2 { margin-top: 0; }
+  .budget-section { margin-bottom: 20px; }
+  .budget-section h3 { margin-bottom: 8px; }
+  #table-income thead th { background: #2e7d32; } #table-income tbody td { background: #c8e6c9; }
+  #table-expenses thead th { background: #c62828; } #table-expenses tbody td { background: #ffcdd2; }
+  #table-savings thead th { background: #1565c0; } #table-savings tbody td { background: #90caf9; }
+  #table-remaining thead th { background: #424242; } #table-remaining tbody td { background: #f5f5f5; }
+
+</style>
+</head>
+<body>
+<!-- Fixed top-right buttons -->
+
+
+
+
+
+<div style="position: fixed; top: 10px; left: 10px; display: flex; gap: 10px; z-index: 9999;">
+    <button id="budget-management" style="background: #ffc107; color: white; border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer;">ניהול תקציב</button>
+  <button id="export-data" style="background-color: #dc3545; color: white; border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer;">ייצא נתונים</button>
+  <button id="import-data" style="background-color: #28a745; color: white; border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer;">ייבא נתונים</button>
+  <input type="file" id="import-file" accept=".json" style="display: none;" />
+  <button id="show-projection" style="color: green; border-radius: 6px; border: 1px solid #ccc; background-color: white; padding: 10px 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">תחזית עתידית</button>
+  <button id="view-history">הצג היסטוריה</button>
+  <button id="show-returns">הצג תשואות</button>
+  <button id="theme-toggle" onclick="toggleTheme()">מצב כהה</button>
+</div>
+
+
+
+
+
+<h1 style="color:#222;">ניהול השקעות וכספים</h1>
+<div style="display: flex; justify-content: flex-start; margin-top: -10px; margin-bottom: 10px;">
+  <button id="private-toggle" style="color: red; border: 1px solid #ccc; border-radius: 6px; background-color: white; padding: 6px 12px;">מצב רגיש</button>
+</div>
+
+<div style="text-align: center; font-weight: bold; margin-bottom: 10px;">
+<span id="usd-rate-display"></span> | <span id="eur-rate-display"></span>
+</div>
+<form id="investment-form">
+<input id="platform" placeholder="פלטפורמה (למשל בלינק)" required="" type="text"/>
+<select id="assetType" required="">
+<option value="">בחר סוג השקעה</option>
+<option value="מניות">מניות</option>
+<option value="אג״ח">אג״ח</option>
+<option value="מטבעות דיגיטליים">מטבעות דיגיטליים</option>
+<option value="נדל״ן">נדל״ן</option>
+<option value="אחר">אחר</option>
+</select>
+<input id="customAsset" placeholder="סוג השקעה מותאם אישית" style="display:none;" type="text"/>
+<input id="assetName" placeholder="שם הנכס (לא חובה)" type="text"/>
+<input id="amount" placeholder="סכום" required="" type="number"/>
+<select id="currency">
+<option value="₪">₪</option>
+<option value="$">$</option>
+<option value="€">€</option>
+</select>
+<div id="rate-box" style="display:none;">שער מטבע: <input id="rate-input" step="0.01" style="width: 70px;" type="number"/></div>
+<button type="submit">הוסף השקעה</button>
+</form>
+<div id="controls" style="text-align:center; margin: 10px 0;">
+<input id="search-input" placeholder="חפש השקעה, פלטפורמה או נכס..." style="padding:8px; width:220px;" type="text"/>
+</div>
+<div style="display: flex; justify-content: flex-end; margin: 10px 0;"><button id="reset-table" style="background-color: red; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer;">איפוס טבלה</button></div><table id="investment-table">
+<thead>
+<tr>
+<th>פלטפורמה</th>
+<th>סוג השקעה</th>
+<th>נכס</th>
+<th>השקעה</th>
+<th>תאריך</th>
+<th>פעולות</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+<div id="history-list" style="display:none; text-align:center; margin-top: 10px; font-weight: bold;"></div>
+<div style="display: flex; justify-content: center; align-items: center; gap: 40px; margin-top: 10px;"><div style="text-align: center;">
+<p id="total-shekel" style="font-weight: bold;"></p>
+<p id="chart-info" style="font-weight: bold; color: #0077cc;"></p>
+<canvas height="300" id="pieChart" width="300"></canvas>
+</div><div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+<button id="toggle-chart">פלטפורמה</button>
+<button id="save-data" style="background-color: #007BFF; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer;">שמור נתונים</button>
+</div></div>
+<br/><br/><p style="text-align: center; color: gray;">גרסה 2.0.0</p>
+<script src="https://cdn.jsdelivr.net/npm/chart.js">
+
+function formatNumberWithCommas(num) {
+  return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// תחזית עתידית
+document.getElementById("show-projection").addEventListener("click", () => {
+  const overlay = document.createElement("div");
+  overlay.style.position = "fixed";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.width = "100vw";
+  overlay.style.height = "100vh";
+  overlay.style.background = "rgba(0, 0, 0, 0.5)";
+  overlay.style.display = "flex";
+  overlay.style.justifyContent = "center";
+  overlay.style.alignItems = "center";
+  overlay.style.zIndex = "1000";
+
+  const box = document.createElement("div");
+  box.style.background = "#fff";
+  box.style.padding = "20px";
+  box.style.borderRadius = "10px";
+  box.style.width = "400px";
+  box.style.maxWidth = "95vw";
+  box.style.textAlign = "right";
+  box.style.fontFamily = "inherit";
+
+  box.innerHTML = `
+    <h3>תחזית עתידית</h3>
+    <label>סכום השקעה ראשוני: <input id="initialAmount" type="number" style="width:90%; margin-bottom:5px"/></label><br>
+    <label>השקעה חודשית קבועה: <input id="monthlyAmount" type="number" style="width:90%; margin-bottom:5px"/></label><br>
+    <label>אחוז תשואה שנתי: <input id="annualReturn" type="number" step="0.1" style="width:90%; margin-bottom:5px"/></label><br>
+    <label>מספר שנות השקעה: <input id="yearsCount" type="number" style="width:90%; margin-bottom:10px"/></label><br>
+    <button id="calculateProjection">חשב תחזית</button>
+    <canvas id="projectionChart" height="250" style="margin-top:20px"></canvas>
+    
+<button id="closeProjection" style="margin-top:15px; display:block; margin-right:auto; margin-left:0;">סגור</button>
+
+  `;
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  document.getElementById("closeProjection").onclick = () => {
+    document.body.removeChild(overlay);
+  };
+
+  
+    
+
+document.getElementById("calculateProjection").onclick = () => {
+    const initial = parseFloat(document.getElementById("initialAmount").value) || 0;
+    const monthly = parseFloat(document.getElementById("monthlyAmount").value) || 0;
+    const annualRate = (parseFloat(document.getElementById("annualReturn").value) || 0) / 100;
+    const years = parseInt(document.getElementById("yearsCount").value) || 0;
+    const months = years * 12;
+    const monthlyRate = annualRate / 12;
+
+    const labels = [];
+    const values = [];
+    const deposits = [];
+    let total = initial;
+    let totalDeposited = initial;
+
+    for (let i = 1; i <= months; i++) {
+        total = total * (1 + monthlyRate) + monthly;
+        totalDeposited += monthly;
+
+        if (i % 12 === 0 || i === months) {
+            labels.push(`שנה ${Math.floor(i / 12)}`);
+            values.push(parseFloat(total.toFixed(2)));
+            deposits.push(parseFloat(totalDeposited.toFixed(2)));
+        }
+    }
+
+    const profit = values[values.length - 1] - deposits[deposits.length - 1];
+    const profitDisplay = document.getElementById("profit-display") || document.createElement("p");
+    profitDisplay.id = "profit-display";
+    profitDisplay.style.fontWeight = "bold";
+    profitDisplay.style.color = "#28a745";
+    profitDisplay.style.marginTop = "10px";
+    profitDisplay.textContent = `רווח צפוי לאחר ${years} שנים: ${profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ₪`;
+
+    const calculateBtn = document.getElementById("calculateProjection");
+    calculateBtn.insertAdjacentElement('afterend', profitDisplay);
+
+    const ctx = document.getElementById("projectionChart").getContext("2d");
+    if (window.projectionChartInstance) window.projectionChartInstance.destroy();
+    window.projectionChartInstance = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "תחזית שווי השקעות (₪)",
+                    data: values,
+                    borderWidth: 2,
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0,123,255,0.1)'
+                },
+                {
+                    label: "סך הפקדות מצטבר (₪)",
+                    data: deposits,
+                    borderWidth: 2,
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40,167,69,0.1)'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: true, position: 'bottom' } }
+        }
+    });
+};
+
+
+
+});
+
+// מצב רגיש
+let privateMode = false;
+document.getElementById("private-toggle").addEventListener("click", () => {
+  privateMode = !privateMode;
+  document.body.classList.toggle("private-mode", privateMode);
+  updatePrivateModeView();
+});
+
+function updatePrivateModeView() {
+  const elements = document.querySelectorAll(".amount-display");
+  elements.forEach(el => {
+    if (privateMode) {
+      el.dataset.real = el.textContent;
+      el.textContent = "*** ₪";
+    } else {
+      el.textContent = el.dataset.real || el.textContent;
+    }
+  });
+
+  const totalEl = document.getElementById("total-shekel");
+  if (privateMode) {
+    totalEl.dataset.real = totalEl.textContent;
+    totalEl.textContent = "סך הכל השקעות בשקלים: *** ₪";
+  } else {
+    totalEl.textContent = totalEl.dataset.real || totalEl.textContent;
+  }
+}
+
+
+
+
+
+document.getElementById("reset-table").addEventListener("click", () => {
+  if (document.getElementById("reset-confirm-overlay")) return; // Prevent multiple overlays
+
+  const overlay = document.createElement("div");
+  overlay.id = "reset-confirm-overlay";
+  overlay.style.position = "fixed";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.width = "100vw";
+  overlay.style.height = "100vh";
+  overlay.style.background = "rgba(0, 0, 0, 0.5)";
+  overlay.style.display = "flex";
+  overlay.style.justifyContent = "center";
+  overlay.style.alignItems = "center";
+  overlay.style.zIndex = "1000";
+
+  const box = document.createElement("div");
+  box.style.background = "#ffffff";
+  box.style.padding = "25px";
+  box.style.borderRadius = "14px";
+  box.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.2)";
+  box.style.textAlign = "center";
+  box.style.minWidth = "280px";
+  box.style.fontSize = "1em";
+  box.style.color = "#333";
+
+  const text = document.createElement("p");
+  text.textContent = "האם אתה בטוח שברצונך לאפס את כל הנתונים?";
+  text.style.marginBottom = "15px";
+  text.style.whiteSpace = "nowrap";
+
+  const buttons = document.createElement("div");
+  buttons.style.display = "flex";
+  buttons.style.justifyContent = "center";
+  buttons.style.gap = "10px";
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.textContent = "ביטול";
+  cancelBtn.style.padding = "10px 20px";
+  cancelBtn.style.backgroundColor = "#ccc";
+  cancelBtn.style.border = "none";
+  cancelBtn.style.borderRadius = "6px";
+  cancelBtn.style.cursor = "pointer";
+  cancelBtn.onclick = () => document.body.removeChild(overlay);
+
+  const confirmBtn = document.createElement("button");
+  confirmBtn.textContent = "אישור";
+  confirmBtn.style.padding = "10px 20px";
+  confirmBtn.style.backgroundColor = "#28a745";
+  confirmBtn.style.color = "white";
+  confirmBtn.style.border = "none";
+  confirmBtn.style.borderRadius = "6px";
+  confirmBtn.style.cursor = "pointer";
+  confirmBtn.onclick = () => {
+    localStorage.removeItem("investments");
+    location.reload();
+  };
+
+  buttons.appendChild(cancelBtn);
+  buttons.appendChild(confirmBtn);
+  box.appendChild(text);
+  box.appendChild(buttons);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+});
+
+</script>
+<script>const months = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
+
+    const form = document.getElementById("investment-form");
+    const tableBody = document.querySelector("#investment-table tbody");
+    const assetType = document.getElementById("assetType");
+    const customAsset = document.getElementById("customAsset");
+    const assetNameInput = document.getElementById("assetName");
+    const rateBox = document.getElementById("rate-box");
+    const rateInput = document.getElementById("rate-input");
+    const currencySelector = document.getElementById("currency");
+    const ctx = document.getElementById("pieChart").getContext("2d");
+    const totalShekel = document.getElementById("total-shekel");
+    const chartInfo = document.getElementById("chart-info");
+    let chart;
+    let storedRates = JSON.parse(localStorage.getItem("storedRates") || "{}");
+    let currentLabelClick = {};
+
+    assetType.addEventListener("change", () => {
+      customAsset.style.display = assetType.value === "אחר" ? "inline" : "none";
+    });
+
+    currencySelector.addEventListener("change", () => {
+      const selected = currencySelector.value;
+      if (selected === "$" || selected === "€") {
+        rateBox.style.display = "inline";
+        rateInput.value = storedRates[selected] || "";
+      } else {
+        rateBox.style.display = "none";
+        rateInput.value = "";
+      }
+    });
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const platform = document.getElementById("platform").value;
+      const assetName = assetNameInput.value || "";
+      const amount = parseFloat(document.getElementById("amount").value);
+      const currency = currencySelector.value;
+      const type = assetType.value === "אחר" ? customAsset.value : assetType.value;
+      const timestamp = new Date().toLocaleString("he-IL");
+
+      if ((currency === "$" || currency === "€") && rateInput.value) {
+        storedRates[currency] = parseFloat(rateInput.value);
+        localStorage.setItem("storedRates", JSON.stringify(storedRates));
+
+      if (currency === "$") {
+        document.getElementById("usd-rate-display").textContent = "שער הדולר: " + storedRates["$"];
+      } else if (currency === "€") {
+        document.getElementById("eur-rate-display").textContent = "שער האירו: " + storedRates["€"];
+      }
+                
+      }
+
+      const investment = { platform, assetType: type, assetName, amount, currency, timestamp };
+      const list = JSON.parse(localStorage.getItem("investments") || "[]");
+      list.push(investment);
+      localStorage.setItem("investments", JSON.stringify(list));
+      addRow(investment);
+      updateChart();
+      updateTotalShekel();
+      form.reset();
+      customAsset.style.display = "none";
+      rateBox.style.display = "none";
+    });
+
+    function addRow(data) {
+      const row = document.createElement("tr");
+      
+    const combined = formatNumberWithCommas(data.amount) + data.currency;
+    
+      let shekelHint = "";
+      const rate = storedRates[data.currency];
+      if (rate && data.currency !== "₪") {
+        const calc = formatNumberWithCommas(parseFloat(data.amount) * rate);
+        shekelHint = ` (~${calc}₪)`;
+      }
+      row.innerHTML = `
+        <td>${data.platform}</td>
+        <td>${data.assetType}</td>
+        <td>${data.assetName || ""}</td>
+        <td class="amount-display">${combined}${shekelHint}</td>
+        <td>${data.timestamp}</td>
+        <td><button onclick="editRow(this)">ערוך</button> <button onclick="deleteRow(this)">מחק</button></td>
+      `;
+      tableBody.appendChild(row);
+    }
+
+    
+function deleteRow(btn) {
+  const row = btn.closest('tr');
+  const index = Array.from(tableBody.children).indexOf(row);
+  let list = JSON.parse(localStorage.getItem("investments") || "[]");
+  list.splice(index, 1);
+  localStorage.setItem("investments", JSON.stringify(list));
+  row.remove();
+  updateChart();
+  updateTotalShekel();
+}
+
+
+    function toggleTheme() {
+      const darkMode = document.body.classList.toggle("dark");
+      document.getElementById("theme-toggle").textContent = darkMode ? "מצב בהיר" : "מצב כהה";
+      localStorage.setItem("theme", darkMode ? "dark" : "light");
+    }
+
+    function updateChart() {
+      const data = JSON.parse(localStorage.getItem("investments") || "[]");
+      const totals = {};
+      const totalSum = data.reduce((sum, inv) => {
+        const rate = storedRates[inv.currency] || 1;
+        const amount = parseFloat(inv.amount);
+        const amountShekel = inv.currency === "₪" ? amount : amount * rate;
+        totals[inv.assetType] = (totals[inv.assetType] || 0) + amountShekel;
+        return sum + amountShekel;
+      }, 0);
+
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: "pie",
+        data: {
+          labels: Object.keys(totals),
+          datasets: [{ data: Object.values(totals) }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              position: "bottom",
+              onClick: (e, legendItem) => {
+                const label = legendItem.text;
+                const index = currentLabelClick[label] = (currentLabelClick[label] || 0) + 1;
+                const value = totals[label].toFixed(2);
+                if (index % 2 === 1) {
+                  chartInfo.textContent = `${label}: ${value}₪`;
+                } else {
+                  const percent = ((value / totalSum) * 100).toFixed(2);
+                  chartInfo.textContent = `${label}: ${percent}% מכלל ההשקעות`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateTotalShekel() {
+      const data = JSON.parse(localStorage.getItem("investments") || "[]");
+      let total = 0;
+      data.forEach(inv => {
+        const rate = storedRates[inv.currency] || 1;
+        const amount = parseFloat(inv.amount);
+        total += inv.currency === "₪" ? amount : amount * rate;
+      });
+      totalShekel.textContent = "סך הכל השקעות בשקלים: " + formatNumberWithCommas(total) + "₪";
+    }
+
+    
+    function editRow(button) {
+      const row = button.parentElement.parentElement;
+      const cells = row.querySelectorAll("td");
+      if (button.textContent === "ערוך") {
+        // convert to editable inputs
+        const platform = cells[0].textContent;
+        const assetType = cells[1].textContent;
+        const assetName = cells[2].textContent;
+        const amountMatch = cells[3].textContent.match(/^([\d.]+)([₪$€])/);
+        const amount = amountMatch ? amountMatch[1] : "";
+        const currency = amountMatch ? amountMatch[2] : "₪";
+
+        cells[0].innerHTML = `<input value="${platform}" />`;
+        cells[1].innerHTML = `<input value="${assetType}" />`;
+        cells[2].innerHTML = `<input value="${assetName}" />`;
+        cells[3].innerHTML = `
+          <input type="number" value="${amount}" style="width:60px" />
+          <select>
+            <option value="₪" ${currency === "₪" ? "selected" : ""}>₪</option>
+            <option value="$" ${currency === "$" ? "selected" : ""}>$</option>
+            <option value="€" ${currency === "€" ? "selected" : ""}>€</option>
+          </select>`;
+        cells[4].textContent = "יתעדכן לאחר שמירה";
+        button.textContent = "שמור";
+      } else {
+        // save changes
+        const platform = cells[0].querySelector("input").value;
+        const assetType = cells[1].querySelector("input").value;
+        const assetName = cells[2].querySelector("input").value;
+        const amount = parseFloat(cells[3].querySelector("input").value);
+        const currency = cells[3].querySelector("select").value;
+        const timestamp = new Date().toLocaleString("he-IL");
+
+        const rate = storedRates[currency] || 1;
+        const shekelHint = currency === "₪" ? "" : ` (~${(amount * rate).toFixed(2)}₪)`;
+        const combined = amount + currency;
+
+        cells[0].textContent = platform;
+        cells[1].textContent = assetType;
+        cells[2].textContent = assetName;
+        cells[3].textContent = combined + shekelHint;
+        cells[4].textContent = timestamp;
+        button.textContent = "ערוך";
+
+        // Update localStorage
+        const rows = Array.from(tableBody.querySelectorAll("tr")).map(tr => ({
+          platform: tr.children[0].textContent,
+          assetType: tr.children[1].textContent,
+          assetName: tr.children[2].textContent,
+          amount: parseFloat(tr.children[3].textContent),
+          currency: tr.children[3].textContent.replace(/[0-9.,~₪$€ ]/g, '').trim() || "₪",
+          timestamp: tr.children[4].textContent
+        }));
+        localStorage.setItem("investments", JSON.stringify(rows));
+        updateChart();
+        updateTotalShekel();
+        document.getElementById("usd-rate-display").textContent = "שער הדולר: " + (storedRates["$"] || "לא הוזן");
+        document.getElementById("eur-rate-display").textContent = "שער האירו: " + (storedRates["€"] || "לא הוזן");
+      }
+    }
+
+
+    
+
+document.getElementById("save-data").addEventListener("click", () => {
+  const monthOptions = months.map(m => `<option value="${m}">${m}</option>`).join("");
+  const monthSelect = document.createElement("select");
+  monthSelect.innerHTML = monthOptions;
+  monthSelect.style.fontSize = "1em";
+
+  const year = new Date().getFullYear();
+
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = "<p>בחר חודש לשמירה:</p>";
+  wrapper.appendChild(monthSelect);
+  
+
+  const confirmBtn = document.createElement("button");
+  confirmBtn.textContent = "אישור";
+  confirmBtn.style.marginTop = "10px";
+
+  
+      confirmBtn.onclick = () => {
+        const month = monthSelect.value;
+        const key = `investments_${month}_${year}`;
+        const data = localStorage.getItem("investments");
+        // close initial save overlay
+        document.body.removeChild(overlay);
+        // show styled message
+        const ov = document.createElement("div");
+        ov.id = "save-confirm-overlay";
+        ov.style.position = "fixed";
+        ov.style.top = "0";
+        ov.style.left = "0";
+        ov.style.width = "100vw";
+        ov.style.height = "100vh";
+        ov.style.background = "rgba(0, 0, 0, 0.5)";
+        ov.style.display = "flex";
+        ov.style.justifyContent = "center";
+        ov.style.alignItems = "center";
+        ov.style.zIndex = "10000";
+        const box = document.createElement("div");
+        box.style.backgroundColor = "#fff";
+        box.style.borderRadius = "10px";
+        box.style.padding = "20px";
+        box.style.minWidth = "300px";
+        box.style.textAlign = "center";
+        const msg = document.createElement("p");
+        msg.style.marginBottom = "15px";
+        msg.style.whiteSpace = "nowrap";
+        if (data) {
+          localStorage.setItem(key, data);
+          msg.textContent = `הנתונים נשמרו עבור ${month} ${year}`;
+        } else {
+          msg.textContent = "אין נתונים לשמירה.";
+        }
+        box.appendChild(msg);
+        const btn = document.createElement("button");
+        btn.textContent = "אישור";
+        btn.style.padding = "10px 20px";
+        btn.style.backgroundColor = "#28a745";
+        btn.style.color = "#fff";
+        btn.style.border = "none";
+        btn.style.borderRadius = "6px";
+        btn.style.cursor = "pointer";
+        btn.onclick = () => {
+          document.body.removeChild(ov);
+        };
+        box.appendChild(btn);
+        ov.appendChild(box);
+        document.body.appendChild(ov);
+      };
+
+  const overlay = document.createElement("div");
+  overlay.style.position = "fixed";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.width = "100vw";
+  overlay.style.height = "100vh";
+  overlay.style.background = "rgba(0,0,0,0.5)";
+  overlay.style.display = "flex";
+  overlay.style.justifyContent = "center";
+  overlay.style.alignItems = "center";
+  overlay.style.zIndex = "1000";
+
+  const box = document.createElement("div");
+  box.style.background = "#fff";
+  box.style.padding = "20px";
+  box.style.borderRadius = "10px";
+  box.appendChild(wrapper);
+  
+const cancelBtn = document.createElement("button");
+cancelBtn.textContent = "ביטול";
+cancelBtn.style.marginTop = "10px";
+cancelBtn.style.marginRight = "10px";
+cancelBtn.onclick = () => {
+  document.body.removeChild(overlay);
+};
+box.appendChild(cancelBtn);
+box.appendChild(confirmBtn);
+            
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+});
+
+
+document.getElementById("view-history").addEventListener("click", () => {
+  const keys = Object.keys(localStorage).filter(k => k.startsWith("investments_") && k !== "investments" && k !== "storedRates");
+  if (keys.length === 0) {
+    alert("לא נמצאו שמירות.");
+    return;
+  }
+
+  const overlay = document.createElement("div");
+  overlay.style.position = "fixed";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.width = "100vw";
+  overlay.style.height = "100vh";
+  overlay.style.background = "rgba(0,0,0,0.5)";
+  overlay.style.display = "flex";
+  overlay.style.justifyContent = "center";
+  overlay.style.alignItems = "center";
+  overlay.style.zIndex = "1000";
+
+  const box = document.createElement("div");
+  box.style.background = "#fff";
+  box.style.padding = "20px";
+  box.style.borderRadius = "10px";
+  box.style.maxHeight = "80vh";
+  box.style.overflowY = "auto";
+  box.style.direction = "rtl";
+  box.style.width = "350px";
+
+  const title = document.createElement("h3");
+  title.textContent = "היסטוריית שמירות";
+  box.appendChild(title);
+
+  keys.forEach(key => {
+    const entryRow = document.createElement("div");
+    entryRow.style.display = "flex";
+    entryRow.style.justifyContent = "space-between";
+    entryRow.style.alignItems = "center";
+    entryRow.style.marginBottom = "10px";
+
+    const dateLabel = document.createElement("span");
+    dateLabel.textContent = key.replace("investments_", "").replace("_", " ");
+    dateLabel.style.flex = "1";
+
+    const buttonGroup = document.createElement("div");
+    buttonGroup.style.display = "flex";
+    buttonGroup.style.gap = "10px";
+
+    const showBtn = document.createElement("button");
+    showBtn.textContent = "הצג";
+    showBtn.onclick = () => {
+      const data = localStorage.getItem(key);
+      if (data) {
+        localStorage.setItem("investments", data);
+        location.reload(); // reload to trigger loading from updated "investments"
+      }
+    };
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "מחק";
+    
+    deleteBtn.onclick = () => {
+      const parts = key.replace("investments_", "").split("_");
+      const month = parts[0], year = parts[1];
+      // יצירת החלונית המותאמת
+      const overlayDel = document.createElement("div");
+      overlayDel.id = "delete-confirm-overlay";
+      overlayDel.style.position = "fixed";
+      overlayDel.style.top = "0";
+      overlayDel.style.left = "0";
+      overlayDel.style.width = "100vw";
+      overlayDel.style.height = "100vh";
+      overlayDel.style.background = "rgba(0, 0, 0, 0.5)";
+      overlayDel.style.display = "flex";
+      overlayDel.style.justifyContent = "center";
+      overlayDel.style.alignItems = "center";
+      overlayDel.style.zIndex = "10000";
+      const boxDel = document.createElement("div");
+      boxDel.style.backgroundColor = "#fff";
+      boxDel.style.borderRadius = "10px";
+      boxDel.style.padding = "20px";
+      boxDel.style.minWidth = "300px";
+      boxDel.style.textAlign = "center";
+      // טקסט ההודעה בעיצוב עדין
+      const msg = document.createElement("p");
+      msg.textContent = `האם אתה בטוח שברצונך למחוק את הנתונים עבור ${month} ${year}?`;
+      msg.style.marginBottom = "15px";
+      msg.style.whiteSpace = "nowrap";
+      boxDel.appendChild(msg);
+      // כפתורי אישור וביטול
+      const btnContainer = document.createElement("div");
+      btnContainer.style.display = "flex";
+      btnContainer.style.justifyContent = "center";
+      btnContainer.style.gap = "10px";
+      const confirmBtn = document.createElement("button");
+      confirmBtn.textContent = "אישור";
+      confirmBtn.style.padding = "10px 20px";
+      confirmBtn.style.backgroundColor = "#28a745";
+      confirmBtn.style.color = "#fff";
+      confirmBtn.style.border = "none";
+      confirmBtn.style.borderRadius = "6px";
+      confirmBtn.style.cursor = "pointer";
+      confirmBtn.onclick = () => {
+        localStorage.removeItem(key);
+        document.body.removeChild(overlay);
+        document.body.removeChild(overlayDel);
+      };
+      const cancelBtn = document.createElement("button");
+      cancelBtn.textContent = "ביטול";
+      cancelBtn.style.padding = "10px 20px";
+      cancelBtn.style.backgroundColor = "#ccc";
+      cancelBtn.style.color = "#333";
+      cancelBtn.style.border = "none";
+      cancelBtn.style.borderRadius = "6px";
+      cancelBtn.style.cursor = "pointer";
+      cancelBtn.onclick = () => document.body.removeChild(overlayDel);
+      btnContainer.appendChild(confirmBtn);
+      btnContainer.appendChild(cancelBtn);
+      boxDel.appendChild(btnContainer);
+      overlayDel.appendChild(boxDel);
+      document.body.appendChild(overlayDel);
+    };
+
+
+    buttonGroup.appendChild(showBtn);
+    buttonGroup.appendChild(deleteBtn);
+    entryRow.appendChild(dateLabel);
+    entryRow.appendChild(buttonGroup);
+    box.appendChild(entryRow);
+  });
+
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "סגור";
+  closeBtn.style.marginTop = "15px";
+  closeBtn.onclick = () => {
+    document.body.removeChild(overlay);
+  };
+  box.appendChild(closeBtn);
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+});
+document.getElementById("search-input").addEventListener("input", function () {
+  const val = this.value.trim().toLowerCase();
+  Array.from(document.querySelectorAll("#investment-table tbody tr")).forEach(row => {
+    const match = Array.from(row.cells).some(cell =>
+      cell.textContent.toLowerCase().includes(val)
+    );
+    row.style.display = match ? "" : "none";
+  });
+});
+
+let currentChartView = "assetType";
+document.getElementById("toggle-chart").addEventListener("click", () => {
+  currentChartView = currentChartView === "assetType" ? "platform" : "assetType";
+  document.getElementById("toggle-chart").textContent = currentChartView === "assetType" ? "פלטפורמה" : "סוג השקעה";
+  updateChart();
+});
+
+// Override updateChart to support dynamic key
+function updateChart() {
+  const data = JSON.parse(localStorage.getItem("investments") || "[]");
+  const totals = {};
+  const totalSum = data.reduce((sum, inv) => {
+    const rate = storedRates[inv.currency] || 1;
+    const amount = parseFloat(inv.amount);
+    const amountShekel = inv.currency === "₪" ? amount : amount * rate;
+    const category = inv[currentChartView] || "אחר";
+    totals[category] = (totals[category] || 0) + amountShekel;
+    return sum + amountShekel;
+  }, 0);
+
+  if (chart) chart.destroy();
+  chart = new Chart(ctx, {
+    type: "pie",
+    data: {
+      labels: Object.keys(totals),
+      datasets: [{ data: Object.values(totals) }]
+    },
+    options: {
+      plugins: {
+        legend: {
+          position: "bottom",
+          onClick: (e, legendItem) => {
+            const label = legendItem.text;
+            const index = currentLabelClick[label] = (currentLabelClick[label] || 0) + 1;
+            const value = totals[label].toFixed(2);
+            if (index % 2 === 1) {
+              chartInfo.textContent = `${label}: ${value}₪`;
+            } else {
+              const percent = ((value / totalSum) * 100).toFixed(2);
+              chartInfo.textContent = `${label}: ${percent}% מכלל ההשקעות`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+
+    window.onload = () => {
+      const saved = JSON.parse(localStorage.getItem("investments") || "[]");
+      saved.forEach(addRow);
+      updateChart();
+      updateTotalShekel();
+      
+      document.getElementById("usd-rate-display").textContent = "שער הדולר: " + (storedRates["$"] || "לא הוזן");
+      document.getElementById("eur-rate-display").textContent = "שער האירו: " + (storedRates["€"] || "לא הוזן");
+
+      if (false && localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark");
+        document.getElementById("theme-toggle").textContent = "מצב בהיר";
+      }
+    };
+  
+
+function deleteSavedData(key) {
+  if (confirm("האם אתה בטוח שברצונך למחוק את השמירה הזו?")) {
+    localStorage.removeItem(key);
+    alert("הנתונים נמחקו.");
+    location.reload();
+  }
+}
+        
+
+
+
+
+
+document.getElementById("show-returns").addEventListener("click", () => {
+  const overlay = document.createElement("div");
+  overlay.style.position = "fixed";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.width = "100vw";
+  overlay.style.height = "100vh";
+  overlay.style.background = "rgba(0, 0, 0, 0.5)";
+  overlay.style.display = "flex";
+  overlay.style.justifyContent = "center";
+  overlay.style.alignItems = "center";
+  overlay.style.zIndex = "1000";
+
+  const box = document.createElement("div");
+  box.style.background = "#fff";
+  box.style.padding = "20px";
+  box.style.borderRadius = "10px";
+  box.style.width = "600px";
+  box.style.maxWidth = "95vw";
+  box.style.maxHeight = "90vh";
+  box.style.overflowY = "auto";
+  box.style.textAlign = "center";
+
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "סגור";
+  closeBtn.style.marginBottom = "10px";
+  closeBtn.style.float = "left";
+  closeBtn.onclick = () => {
+    document.body.removeChild(overlay);
+  };
+
+  const yearSelect = document.createElement("select");
+  yearSelect.style.marginBottom = "10px";
+  yearSelect.style.padding = "6px";
+
+  const currentYear = new Date().getFullYear();
+  const years = new Set();
+  Object.keys(localStorage).forEach(k => {
+    if (k.startsWith("investments_")) {
+      const parts = k.split("_");
+      const y = parts[2];
+      if (y && !isNaN(y)) years.add(parseInt(y));
+    }
+  });
+  years.add(currentYear);
+  years.add(currentYear + 1);
+  const sortedYears = Array.from(years).sort();
+  sortedYears.forEach(y => {
+    const opt = document.createElement("option");
+    opt.value = y;
+    opt.textContent = y;
+    if (y === currentYear) opt.selected = true;
+    yearSelect.appendChild(opt);
+  });
+
+  const title = document.createElement("h3");
+  title.style.textAlign = "center";
+
+  const canvas = document.createElement("canvas");
+  canvas.id = "barChart";
+  canvas.height = 300;
+
+  box.appendChild(closeBtn);
+  box.appendChild(yearSelect);
+  box.appendChild(title);
+  box.appendChild(canvas);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  const drawChart = () => {
+    const selectedYear = yearSelect.value;
+    title.textContent = "תשואות לשנת " + selectedYear;
+
+    const ctx = canvas.getContext("2d");
+    const months = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
+    const monthTotals = {};
+    months.forEach(month => {
+      monthTotals[month] = 0;
+    });
+
+    const keys = Object.keys(localStorage).filter(k =>
+      k.startsWith("investments_") && k.endsWith("_" + selectedYear)
+    );
+
+    keys.forEach(key => {
+      const parts = key.replace("investments_", "").split("_");
+      const month = parts[0];
+      const data = JSON.parse(localStorage.getItem(key));
+      if (!Array.isArray(data)) return;
+
+      let total = 0;
+      data.forEach(inv => {
+        const rate = storedRates[inv.currency] || 1;
+        const amount = parseFloat(inv.amount);
+        const shekelAmount = inv.currency === "₪" ? amount : amount * rate;
+        total += shekelAmount;
+      });
+
+      if (monthTotals.hasOwnProperty(month)) {
+        monthTotals[month] = total;
+      }
+    });
+
+    if (window.barChartInstance) window.barChartInstance.destroy();
+    window.barChartInstance = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: months,
+        datasets: [{
+          label: "סך השקעות בש״ח",
+          data: months.map(month => monthTotals[month]),
+          backgroundColor: "#007BFF"
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+  };
+
+  yearSelect.addEventListener("change", drawChart);
+  drawChart();
+});
+
+
+function formatNumberWithCommas(num) {
+  return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// תחזית עתידית
+document.getElementById("show-projection").addEventListener("click", () => {
+  const overlay = document.createElement("div");
+  overlay.style.position = "fixed";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.width = "100vw";
+  overlay.style.height = "100vh";
+  overlay.style.background = "rgba(0, 0, 0, 0.5)";
+  overlay.style.display = "flex";
+  overlay.style.justifyContent = "center";
+  overlay.style.alignItems = "center";
+  overlay.style.zIndex = "1000";
+
+  const box = document.createElement("div");
+  box.style.background = "#fff";
+  box.style.padding = "20px";
+  box.style.borderRadius = "10px";
+  box.style.width = "400px";
+  box.style.maxWidth = "95vw";
+  box.style.textAlign = "right";
+  box.style.fontFamily = "inherit";
+
+  box.innerHTML = `
+    <h3>תחזית עתידית</h3>
+    <label>סכום השקעה ראשוני: <input id="initialAmount" type="number" style="width:90%; margin-bottom:5px"/></label><br>
+    <label>השקעה חודשית קבועה: <input id="monthlyAmount" type="number" style="width:90%; margin-bottom:5px"/></label><br>
+    <label>אחוז תשואה שנתי: <input id="annualReturn" type="number" step="0.1" style="width:90%; margin-bottom:5px"/></label><br>
+    <label>מספר שנות השקעה: <input id="yearsCount" type="number" style="width:90%; margin-bottom:10px"/></label><br>
+    <button id="calculateProjection">חשב תחזית</button>
+    <canvas id="projectionChart" height="250" style="margin-top:20px"></canvas>
+    
+<button id="closeProjection" style="margin-top:15px; display:block; margin-right:auto; margin-left:0;">סגור</button>
+
+  `;
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  document.getElementById("closeProjection").onclick = () => {
+    document.body.removeChild(overlay);
+  };
+
+  
+    
+
+document.getElementById("calculateProjection").onclick = () => {
+    const initial = parseFloat(document.getElementById("initialAmount").value) || 0;
+    const monthly = parseFloat(document.getElementById("monthlyAmount").value) || 0;
+    const annualRate = (parseFloat(document.getElementById("annualReturn").value) || 0) / 100;
+    const years = parseInt(document.getElementById("yearsCount").value) || 0;
+    const months = years * 12;
+    const monthlyRate = annualRate / 12;
+
+    const labels = [];
+    const values = [];
+    const deposits = [];
+    let total = initial;
+    let totalDeposited = initial;
+
+    for (let i = 1; i <= months; i++) {
+        total = total * (1 + monthlyRate) + monthly;
+        totalDeposited += monthly;
+
+        if (i % 12 === 0 || i === months) {
+            labels.push(`שנה ${Math.floor(i / 12)}`);
+            values.push(parseFloat(total.toFixed(2)));
+            deposits.push(parseFloat(totalDeposited.toFixed(2)));
+        }
+    }
+
+    const profit = values[values.length - 1] - deposits[deposits.length - 1];
+    const profitDisplay = document.getElementById("profit-display") || document.createElement("p");
+    profitDisplay.id = "profit-display";
+    profitDisplay.style.fontWeight = "bold";
+    profitDisplay.style.color = "#28a745";
+    profitDisplay.style.marginTop = "10px";
+    profitDisplay.textContent = `רווח צפוי לאחר ${years} שנים: ${profit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ₪`;
+
+    const calculateBtn = document.getElementById("calculateProjection");
+    calculateBtn.insertAdjacentElement('afterend', profitDisplay);
+
+    const ctx = document.getElementById("projectionChart").getContext("2d");
+    if (window.projectionChartInstance) window.projectionChartInstance.destroy();
+    window.projectionChartInstance = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "תחזית שווי השקעות (₪)",
+                    data: values,
+                    borderWidth: 2,
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0,123,255,0.1)'
+                },
+                {
+                    label: "סך הפקדות מצטבר (₪)",
+                    data: deposits,
+                    borderWidth: 2,
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40,167,69,0.1)'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: true, position: 'bottom' } }
+        }
+    });
+};
+
+
+
+});
+
+// מצב רגיש
+let privateMode = false;
+document.getElementById("private-toggle").addEventListener("click", () => {
+  privateMode = !privateMode;
+  document.body.classList.toggle("private-mode", privateMode);
+  updatePrivateModeView();
+});
+
+function updatePrivateModeView() {
+  const elements = document.querySelectorAll(".amount-display");
+  elements.forEach(el => {
+    if (privateMode) {
+      el.dataset.real = el.textContent;
+      el.textContent = "*** ₪";
+    } else {
+      el.textContent = el.dataset.real || el.textContent;
+    }
+  });
+
+  const totalEl = document.getElementById("total-shekel");
+  if (privateMode) {
+    totalEl.dataset.real = totalEl.textContent;
+    totalEl.textContent = "סך הכל השקעות בשקלים: *** ₪";
+  } else {
+    totalEl.textContent = totalEl.dataset.real || totalEl.textContent;
+  }
+}
+
+
+
+
+
+document.getElementById("reset-table").addEventListener("click", () => {
+  if (document.getElementById("reset-confirm-overlay")) return; // Prevent multiple overlays
+
+  const overlay = document.createElement("div");
+  overlay.id = "reset-confirm-overlay";
+  overlay.style.position = "fixed";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.width = "100vw";
+  overlay.style.height = "100vh";
+  overlay.style.background = "rgba(0, 0, 0, 0.5)";
+  overlay.style.display = "flex";
+  overlay.style.justifyContent = "center";
+  overlay.style.alignItems = "center";
+  overlay.style.zIndex = "1000";
+
+  const box = document.createElement("div");
+  box.style.background = "#ffffff";
+  box.style.padding = "25px";
+  box.style.borderRadius = "14px";
+  box.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.2)";
+  box.style.textAlign = "center";
+  box.style.minWidth = "280px";
+  box.style.fontSize = "1em";
+  box.style.color = "#333";
+
+  const text = document.createElement("p");
+  text.textContent = "האם אתה בטוח שברצונך לאפס את כל הנתונים?";
+  text.style.marginBottom = "15px";
+  text.style.whiteSpace = "nowrap";
+
+  const buttons = document.createElement("div");
+  buttons.style.display = "flex";
+  buttons.style.justifyContent = "center";
+  buttons.style.gap = "10px";
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.textContent = "ביטול";
+  cancelBtn.style.padding = "10px 20px";
+  cancelBtn.style.backgroundColor = "#ccc";
+  cancelBtn.style.border = "none";
+  cancelBtn.style.borderRadius = "6px";
+  cancelBtn.style.cursor = "pointer";
+  cancelBtn.onclick = () => document.body.removeChild(overlay);
+
+  const confirmBtn = document.createElement("button");
+  confirmBtn.textContent = "אישור";
+  confirmBtn.style.padding = "10px 20px";
+  confirmBtn.style.backgroundColor = "#28a745";
+  confirmBtn.style.color = "white";
+  confirmBtn.style.border = "none";
+  confirmBtn.style.borderRadius = "6px";
+  confirmBtn.style.cursor = "pointer";
+  confirmBtn.onclick = () => {
+    localStorage.removeItem("investments");
+    location.reload();
+  };
+
+  buttons.appendChild(cancelBtn);
+  buttons.appendChild(confirmBtn);
+  box.appendChild(text);
+  box.appendChild(buttons);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+});
+
+</script>
+<div style="position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;"></div><script>
+
+
+
+document.getElementById("import-file").addEventListener("change", function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      for (const key in data) {
+        localStorage.setItem(key, data[key]);
+      }
+
+      const overlay = document.createElement("div");
+      overlay.style.position = "fixed";
+      overlay.style.top = "0";
+      overlay.style.left = "0";
+      overlay.style.width = "100vw";
+      overlay.style.height = "100vh";
+      overlay.style.background = "rgba(0, 0, 0, 0.4)";
+      overlay.style.display = "flex";
+      overlay.style.justifyContent = "center";
+      overlay.style.alignItems = "center";
+      overlay.style.zIndex = "1000";
+
+      const box = document.createElement("div");
+      box.style.background = "#ffffff";
+      box.style.padding = "25px";
+      box.style.borderRadius = "14px";
+      box.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.2)";
+      box.style.textAlign = "center";
+      box.style.minWidth = "280px";
+      box.style.fontSize = "1em";
+      box.style.color = "#333";
+
+      const icon = document.createElement("div");
+      icon.innerHTML = "✅";
+      icon.style.fontSize = "1.6em";
+      icon.style.marginBottom = "10px";
+
+      const text = document.createElement("p");
+      text.textContent = "הנתונים יובאו בהצלחה! הדף ייטען מחדש.";
+      text.style.marginBottom = "15px";
+      text.style.whiteSpace = "nowrap";
+
+      const btn = document.createElement("button");
+      btn.textContent = "אישור";
+      btn.style.padding = "10px 20px";
+      btn.style.border = "none";
+      btn.style.backgroundColor = "#28a745";
+      btn.style.color = "white";
+      btn.style.borderRadius = "6px";
+      btn.style.cursor = "pointer";
+      btn.onclick = () => location.reload();
+
+      box.appendChild(icon);
+      box.appendChild(text);
+      box.appendChild(btn);
+      overlay.appendChild(box);
+      document.body.appendChild(overlay);
+    } catch (err) {
+      alert("אירעה שגיאה בטעינת הקובץ.");
+    }
+  };
+  reader.readAsText(file);
+});
+
+
+
+
+document.getElementById("reset-table").addEventListener("click", () => {
+  if (document.getElementById("reset-confirm-overlay")) return; // Prevent multiple overlays
+
+  const overlay = document.createElement("div");
+  overlay.id = "reset-confirm-overlay";
+  overlay.style.position = "fixed";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.width = "100vw";
+  overlay.style.height = "100vh";
+  overlay.style.background = "rgba(0, 0, 0, 0.5)";
+  overlay.style.display = "flex";
+  overlay.style.justifyContent = "center";
+  overlay.style.alignItems = "center";
+  overlay.style.zIndex = "1000";
+
+  const box = document.createElement("div");
+  box.style.background = "#ffffff";
+  box.style.padding = "25px";
+  box.style.borderRadius = "14px";
+  box.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.2)";
+  box.style.textAlign = "center";
+  box.style.minWidth = "280px";
+  box.style.fontSize = "1em";
+  box.style.color = "#333";
+
+  const text = document.createElement("p");
+  text.textContent = "האם אתה בטוח שברצונך לאפס את כל הנתונים?";
+  text.style.marginBottom = "15px";
+  text.style.whiteSpace = "nowrap";
+
+  const buttons = document.createElement("div");
+  buttons.style.display = "flex";
+  buttons.style.justifyContent = "center";
+  buttons.style.gap = "10px";
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.textContent = "ביטול";
+  cancelBtn.style.padding = "10px 20px";
+  cancelBtn.style.backgroundColor = "#ccc";
+  cancelBtn.style.border = "none";
+  cancelBtn.style.borderRadius = "6px";
+  cancelBtn.style.cursor = "pointer";
+  cancelBtn.onclick = () => document.body.removeChild(overlay);
+
+  const confirmBtn = document.createElement("button");
+  confirmBtn.textContent = "אישור";
+  confirmBtn.style.padding = "10px 20px";
+  confirmBtn.style.backgroundColor = "#28a745";
+  confirmBtn.style.color = "white";
+  confirmBtn.style.border = "none";
+  confirmBtn.style.borderRadius = "6px";
+  confirmBtn.style.cursor = "pointer";
+  confirmBtn.onclick = () => {
+    localStorage.removeItem("investments");
+    location.reload();
+  };
+
+  buttons.appendChild(cancelBtn);
+  buttons.appendChild(confirmBtn);
+  box.appendChild(text);
+  box.appendChild(buttons);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+});
+
+</script>
+  <!-- Budget Management Modal -->
+  <div id="budget-modal-overlay">
+    <div id="budget-modal-content">
+      <h2>ניהול תקציב</h2>
+      <div class="budget-section">
+        <h3 style="color:green;">הכנסות</h3>
+        <table id="table-income"><thead><tr><th>פריט</th><th>ינו</th><th>פבר</th><th>מרץ</th><th>אפר</th><th>מאי</th><th>יונ</th><th>יול</th><th>אוג</th><th>ספט</th><th>אוק</th><th>נוב</th><th>דצמ</th><th>סה"כ</th><th>פעולה</th></tr></thead><tbody></tbody><tfoot><tr><td>סה"כ</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td></td></tr></tfoot></table>
+        <button class="add-topic-btn" data-table="income" style="background:#28a745;color:white;">הוסף הכנסה</button>
+      </div>
+      <div class="budget-section">
+        <h3 style="color:red;">הוצאות</h3>
+        <table id="table-expenses"><thead><tr><th>פריט</th><th>ינו</th><th>פבר</th><th>מרץ</th><th>אפר</th><th>מאי</th><th>יונ</th><th>יול</th><th>אוג</th><th>ספט</th><th>אוק</th><th>נוב</th><th>דצמ</th><th>סה"כ</th><th>פעולה</th></tr></thead><tbody></tbody><tfoot><tr><td>סה"כ</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td></td></tr></tfoot></table>
+        <button class="add-topic-btn" data-table="expenses" style="background:#c62828;color:white;">הוסף הוצאה</button>
+      </div>
+      <div class="budget-section">
+        <h3 style="color:blue;">חיסכון והשקעות</h3>
+        <table id="table-savings"><thead><tr><th>פריט</th><th>ינו</th><th>פבר</th><th>מרץ</th><th>אפר</th><th>מאי</th><th>יונ</th><th>יול</th><th>אוג</th><th>ספט</th><th>אוק</th><th>נוב</th><th>דצמ</th><th>סה"כ</th><th>פעולה</th></tr></thead><tbody></tbody><tfoot><tr><td>סה"כ</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td></td></tr></tfoot></table>
+        <button class="add-topic-btn" data-table="savings" style="background:#1565c0;color:white;">הוסף חיסכון והשקעה</button>
+      </div>
+      <div class="budget-section">
+        <h3 style="color:gray;">יתרה להקצות</h3>
+        <table id="table-remaining"><thead><tr><th>יתרה</th><th>ינו</th><th>פבר</th><th>מרץ</th><th>אפר</th><th>מאי</th><th>יונ</th><th>יול</th><th>אוג</th><th>ספט</th><th>אוק</th><th>נוב</th><th>דצמ</th><th>סה"כ</th><th></th></tr></thead><tbody></tbody></table>
+      </div>
+      <button id="close-budget-modal" style="background:#333;color:white;">סגור</button>
+    </div>
+  </div>
+  
+  <script>
+    const budgetBtn = document.getElementById('budget-management');
+    const overlay = document.getElementById('budget-modal-overlay');
+    budgetBtn.onclick = () => overlay.style.display = 'flex';
+    document.getElementById('close-budget-modal').onclick = () => overlay.style.display = 'none';
+
+    function addTopicRow(section) {
+      const table = document.getElementById('table-' + section);
+      const tbody = table.querySelector('tbody');
+      const row = document.createElement('tr');
+      let html = '<td><input type="text" placeholder="שם" style="width:100px"/></td>';
+      for (let i=0; i<12; i++) {
+        html += '<td><input type="number" value="0" style="width:60px"/></td>';
+      }
+      html += '<td class="row-total">0</td><td><button class="delete-row" style="background:#e74c3c;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;">מחק</button></td>';
+      row.innerHTML = html;
+      tbody.appendChild(row);
+      attachHandlers(row);
+      recalcSectionTotals(section);
+      recalcRemaining();
+    }
+
+    function attachHandlers(row) {
+      const inputs = row.querySelectorAll('input[type=number]');
+      const totalCell = row.querySelector('.row-total');
+      inputs.forEach(inp => {
+        inp.oninput = () => {
+          let sum = 0;
+          inputs.forEach(i => sum += parseFloat(i.value) || 0);
+          totalCell.textContent = sum;
+          // Update totals for this section and remaining
+          const sec = row.closest('table').id.replace('table-','');
+          recalcSectionTotals(sec);
+          recalcRemaining();
+        };
+      });
+      row.querySelector('.delete-row').onclick = () => {
+        const sec = row.closest('table').id.replace('table-','');
+        row.remove();
+        recalcSectionTotals(sec);
+        recalcRemaining();
+      };
+    }
+
+    function recalcSectionTotals(section) {
+      const table = document.getElementById('table-' + section);
+      const tfoot = table.querySelector('tfoot tr');
+      const totals = Array(12).fill(0);
+      table.querySelectorAll('tbody tr').forEach(r => {
+        r.querySelectorAll('input[type=number]').forEach((inp,i) => {
+          totals[i] += parseFloat(inp.value) || 0;
+        });
+      });
+      // update footer cells
+      totals.forEach((val,i) => {
+        tfoot.children[i+1].textContent = val;
+      });
+      // total sum
+      const overall = totals.reduce((a,b)=>a+b,0);
+      tfoot.children[13].textContent = overall;
+    }
+
+    function recalcRemaining() {
+      const months = 12;
+      const incTot = getMonthTotals('income');
+      const expTot = getMonthTotals('expenses');
+      const savTot = getMonthTotals('savings');
+      const remTable = document.getElementById('table-remaining');
+      const tbody = remTable.querySelector('tbody');
+      let row = tbody.querySelector('tr');
+      if (!row) {
+        row = document.createElement('tr');
+        let html = '<td>יתרה</td>';
+        for (let i=0;i<months;i++) html += '<td></td>';
+        html += '<td class="row-total"></td><td></td>';
+        row.innerHTML = html;
+        tbody.appendChild(row);
+      }
+      const inputs = Array.from(row.children).slice(1,13);
+      let total = 0;
+      inputs.forEach((cell,i) => {
+        const val = incTot[i] - expTot[i] - savTot[i];
+        cell.textContent = val;
+        total += val;
+      });
+      row.querySelector('.row-total').textContent = total;
+    }
+
+    function getMonthTotals(section) {
+      const table = document.getElementById('table-' + section);
+      const totals = Array(12).fill(0);
+      table.querySelectorAll('tbody tr').forEach(r => {
+        const cells = section==='remaining'?r.querySelectorAll('td:not(:first-child):not(.row-total)'):r.querySelectorAll('input[type=number]');
+        cells.forEach((c,i) => {
+          const v = section==='remaining'?parseFloat(c.textContent)||0:parseFloat(c.value)||0;
+          totals[i] += v;
+        });
+      });
+      return totals;
+    }
+
+    document.querySelectorAll('.add-topic-btn').forEach(btn => {
+      btn.onclick = () => addTopicRow(btn.dataset.table);
+    });
+  </script>
+
+
+
+<script>
+// שמירת תקציב אוטומטי
+function saveBudgetSection(section) {
+  var table = document.getElementById('table-' + section);
+  var data = [];
+  table.querySelectorAll('tbody tr').forEach(function(r) {
+    var row = [r.querySelector('input[type=text]').value];
+    r.querySelectorAll('input[type=number]').forEach(function(i) { row.push(i.value); });
+    data.push(row);
+  });
+  localStorage.setItem('budget_' + section, JSON.stringify(data));
+}
+function saveBudget() {
+  ['income','expenses','savings'].forEach(saveBudgetSection);
+}
+// טעינת תקציב אוטומטי
+function loadBudgetSection(section) {
+  var data = JSON.parse(localStorage.getItem('budget_' + section) || '[]');
+  data.forEach(function(rowData) {
+    addTopicRow(section);
+    var table = document.getElementById('table-' + section);
+    var r = table.querySelector('tbody tr:last-child');
+    r.querySelector('input[type=text]').value = rowData[0];
+    var inputs = r.querySelectorAll('input[type=number]');
+    rowData.slice(1).forEach(function(v,i){ inputs[i].value = v; inputs[i].dispatchEvent(new Event('input')); });
+  });
+}
+function loadBudget() {
+  ['income','expenses','savings'].forEach(loadBudgetSection);
+}
+// כפתור ניהול תקציב טוען תקציב לפני פתיחה
+document.getElementById('budget-management').onclick = function() {
+  loadBudget();
+  document.getElementById('budget-modal-overlay').style.display = 'flex';
+};
+// אירועי שמירה אוטומטיים
+['income','expenses','savings'].forEach(function(sec) {
+  document.getElementById('table-' + sec).addEventListener('input', saveBudget);
+  document.getElementById('table-' + sec).addEventListener('click', function(e) {
+    if (e.target && e.target.classList.contains('delete-row')) saveBudget();
+  });
+});
+document.querySelectorAll('.add-topic-btn').forEach(function(btn){
+  btn.addEventListener('click', saveBudget);
+});
+</script>
+
+</body>
+</html>
+
+<script>
+document.getElementById("export-data").addEventListener("click", () => {
+  saveBudget();
+  const allData = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    allData[key] = localStorage.getItem(key);
+  }
+  const blob = new Blob([JSON.stringify(allData, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "investment_backup.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+
+
+
+document.getElementById("reset-table").addEventListener("click", () => {
+  if (document.getElementById("reset-confirm-overlay")) return; // Prevent multiple overlays
+
+  const overlay = document.createElement("div");
+  overlay.id = "reset-confirm-overlay";
+  overlay.style.position = "fixed";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.width = "100vw";
+  overlay.style.height = "100vh";
+  overlay.style.background = "rgba(0, 0, 0, 0.5)";
+  overlay.style.display = "flex";
+  overlay.style.justifyContent = "center";
+  overlay.style.alignItems = "center";
+  overlay.style.zIndex = "1000";
+
+  const box = document.createElement("div");
+  box.style.background = "#ffffff";
+  box.style.padding = "25px";
+  box.style.borderRadius = "14px";
+  box.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.2)";
+  box.style.textAlign = "center";
+  box.style.minWidth = "280px";
+  box.style.fontSize = "1em";
+  box.style.color = "#333";
+
+  const text = document.createElement("p");
+  text.textContent = "האם אתה בטוח שברצונך לאפס את כל הנתונים?";
+  text.style.marginBottom = "15px";
+  text.style.whiteSpace = "nowrap";
+
+  const buttons = document.createElement("div");
+  buttons.style.display = "flex";
+  buttons.style.justifyContent = "center";
+  buttons.style.gap = "10px";
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.textContent = "ביטול";
+  cancelBtn.style.padding = "10px 20px";
+  cancelBtn.style.backgroundColor = "#ccc";
+  cancelBtn.style.border = "none";
+  cancelBtn.style.borderRadius = "6px";
+  cancelBtn.style.cursor = "pointer";
+  cancelBtn.onclick = () => document.body.removeChild(overlay);
+
+  const confirmBtn = document.createElement("button");
+  confirmBtn.textContent = "אישור";
+  confirmBtn.style.padding = "10px 20px";
+  confirmBtn.style.backgroundColor = "#28a745";
+  confirmBtn.style.color = "white";
+  confirmBtn.style.border = "none";
+  confirmBtn.style.borderRadius = "6px";
+  confirmBtn.style.cursor = "pointer";
+  confirmBtn.onclick = () => {
+    localStorage.removeItem("investments");
+    location.reload();
+  };
+
+  buttons.appendChild(cancelBtn);
+  buttons.appendChild(confirmBtn);
+  box.appendChild(text);
+  box.appendChild(buttons);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+});
+
+</script><script>
+document.getElementById("import-data").addEventListener("click", () => {
+  document.getElementById("import-file").click();
+});
+
+
+
+
+document.getElementById("reset-table").addEventListener("click", () => {
+  if (document.getElementById("reset-confirm-overlay")) return; // Prevent multiple overlays
+
+  const overlay = document.createElement("div");
+  overlay.id = "reset-confirm-overlay";
+  overlay.style.position = "fixed";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.width = "100vw";
+  overlay.style.height = "100vh";
+  overlay.style.background = "rgba(0, 0, 0, 0.5)";
+  overlay.style.display = "flex";
+  overlay.style.justifyContent = "center";
+  overlay.style.alignItems = "center";
+  overlay.style.zIndex = "1000";
+
+  const box = document.createElement("div");
+  box.style.background = "#ffffff";
+  box.style.padding = "25px";
+  box.style.borderRadius = "14px";
+  box.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.2)";
+  box.style.textAlign = "center";
+  box.style.minWidth = "280px";
+  box.style.fontSize = "1em";
+  box.style.color = "#333";
+
+  const text = document.createElement("p");
+  text.textContent = "האם אתה בטוח שברצונך לאפס את כל הנתונים?";
+  text.style.marginBottom = "15px";
+  text.style.whiteSpace = "nowrap";
+
+  const buttons = document.createElement("div");
+  buttons.style.display = "flex";
+  buttons.style.justifyContent = "center";
+  buttons.style.gap = "10px";
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.textContent = "ביטול";
+  cancelBtn.style.padding = "10px 20px";
+  cancelBtn.style.backgroundColor = "#ccc";
+  cancelBtn.style.border = "none";
+  cancelBtn.style.borderRadius = "6px";
+  cancelBtn.style.cursor = "pointer";
+  cancelBtn.onclick = () => document.body.removeChild(overlay);
+
+  const confirmBtn = document.createElement("button");
+  confirmBtn.textContent = "אישור";
+  confirmBtn.style.padding = "10px 20px";
+  confirmBtn.style.backgroundColor = "#28a745";
+  confirmBtn.style.color = "white";
+  confirmBtn.style.border = "none";
+  confirmBtn.style.borderRadius = "6px";
+  confirmBtn.style.cursor = "pointer";
+  confirmBtn.onclick = () => {
+    localStorage.removeItem("investments");
+    location.reload();
+  };
+
+  buttons.appendChild(cancelBtn);
+  buttons.appendChild(confirmBtn);
+  box.appendChild(text);
+  box.appendChild(buttons);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+});
+
+</script>
